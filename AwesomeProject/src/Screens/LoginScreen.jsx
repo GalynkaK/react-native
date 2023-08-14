@@ -1,13 +1,26 @@
-import { useState } from "react";
+import React, { useState, useCallback } from 'react';
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  Platform,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
+
 import { useFonts } from 'expo-font';
-import { ImageBackground, Keyboard, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import * as SplashScreen from 'expo-splash-screen';
 
 const initialState = {
   email: '',
   password: '',
 };
 
-const initialFocusState = {
+const initialFocuseState = {
   email: false,
   password: false,
 };
@@ -17,17 +30,16 @@ SplashScreen.preventAutoHideAsync();
 const LoginScreen = () => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
-  const [isFocusInput, setIsShowInput] = useState(initialFocusState);
+  const [isFocusInput, setIsFocusInput] = useState(initialFocuseState);
 
-  const [secureTextEntry, setIsFocusInput] = useState(true);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
   const openPassword = () => {
     setSecureTextEntry(!secureTextEntry);
   };
 
   const [fontsLoaded] = useFonts({
-    RobotoRegular: require('../../fonts/assets/Roboto-Regular.ttf'),
-    RobotoMedium: require('../../fonts/assets/Roboto-Medium.ttf'),
-
+    RobotoRegular: require('../../assets/fonts/Roboto-Regular.ttf'),
+    RobotoMedium: require('../../assets/fonts/Roboto-Medium.ttf'),
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -41,42 +53,64 @@ const LoginScreen = () => {
     Keyboard.dismiss();
     setState(initialState);
   };
+
   if (!fontsLoaded) {
     return null;
   }
 
   return (
     <TouchableWithoutFeedback onPress={keyboardHide}>
-      <View style={StyleSheet.container}>
+      <View style={styles.container}>
         <ImageBackground
           source={require('../../assets/image/bg.jpg')}
-          style={styles.imageBackground}>
+          style={styles.imageBg}
+        >
           <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} >
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          >
             <View onLayout={onLayoutRootView}>
-              <View style={{
-                ...styles.formWrapper,
-                ...Platform.select({
-                  ios: { marginTop: isShowKeyboard ? 456 : 0, },
-                  android: { marginTop: isShowKeyboard ? -50 : 0, },
-                }),
-              }}
-              >
-                <Text style={{
-                  ...styles.title,
-                  marginTop: isShowKeyboard ? 24 : 0,
-                }}
-                >Увійти</Text>
-                <View style={{
-                  paddingBottom: isShowKeyboard ? 32 : 111,
-                }} >
+              <View
+                style={{
+                  ...styles.formWrapper,
 
+                  ...Platform.select({
+                    ios: {
+                      marginTop: isShowKeyboard ? 456 : 0,
+                    },
+                    android: {
+                      marginTop: isShowKeyboard ? -50 : 0,
+                    },
+                  }),
+                }}
+              >
+                <Text
+                  style={{
+                    ...styles.title,
+                    marginTop: isShowKeyboard ? 24 : 0,
+                  }}
+                >
+                  Увійти
+                </Text>
+
+                <View
+                  style={{
+                    paddingBottom: isShowKeyboard
+                      ? 32
+                      : 111,
+                  }}
+                >
                   <View style={styles.inputMail}>
-                    <TextInput style={{
-                      ...styles.input,
-                      borderColor: inFocusInput.email ? '#FF6C00' : '#F6F6F6',
-                      backgroundColor: isFocusInput.email ? '#FFFFFF' : 'F6F6F6'.
-                    }}
+                    <TextInput
+                      style={{
+                        ...styles.input,
+                        borderColor: isFocusInput.email
+                          ? '#FF6C00'
+                          : '#F6F6F6',
+                        backgroundColor:
+                          isFocusInput.email
+                            ? '#FFFFFF'
+                            : '#F6F6F6',
+                      }}
                       textAlign={'left'}
                       placeholderTextColor={'#BDBDBD'}
                       keyboardType="email-address"
@@ -101,14 +135,21 @@ const LoginScreen = () => {
                           ...prevState,
                           email: value,
                         }))
-                      } />
+                      }
+                    />
                   </View>
                   <View style={styles.inputPassword}>
                     <TextInput
                       style={{
                         ...styles.input,
-                        borderColor: isFocusInput.password ? '#FF6C00' : '#F6F6F6',
-                        backgroundColor: isFocusInput.password ? '#FFFFFF' : '#F6F6F6',
+                        borderColor:
+                          isFocusInput.password
+                            ? '#FF6C00'
+                            : '#F6F6F6',
+                        backgroundColor:
+                          isFocusInput.password
+                            ? '#FFFFFF'
+                            : '#F6F6F6',
                       }}
                       textAlign={'left'}
                       placeholderTextColor={'#BDBDBD'}
@@ -134,20 +175,30 @@ const LoginScreen = () => {
                           ...prevState,
                           password: value,
                         }))
-                      } />
-                    <Text style={styles.showPass}
-                      onPress={openPassword} >
-                      {secureTextEntry ? 'Показати' : 'Прихвати'}
+                      }
+                    />
+                    <Text
+                      style={styles.showPass}
+                      onPress={openPassword}
+                    >
+                      {secureTextEntry
+                        ? 'Показати'
+                        : 'Приховати'}
                     </Text>
                   </View>
                   <TouchableOpacity
-                    style={styles.button}
+                    style={styles.btn}
                     activeOpacity={0.8}
-                    onPress={keyboardHide} >
-                    <Text style={styles.formLink}>Увійти</Text>
+                    onPress={keyboardHide}
+                  >
+                    <Text style={styles.btnText}>
+                      Увійти
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Text style={StyleSheet.formLink}>Немає акаунту? Зареєструватися</Text>
+                    <Text style={styles.formLink}>
+                      Неміє акаунта? Зареєструватися
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -164,7 +215,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  imageBackground: {
+  imageBg: {
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-end',
@@ -214,7 +265,7 @@ const styles = StyleSheet.create({
     right: 16,
     color: '#1B4371',
   },
-  button: {
+  btn: {
     marginTop: 43,
     backgroundColor: '#FF6C00',
     height: 51,
@@ -236,4 +287,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#1B4371',
   },
-})
+});
